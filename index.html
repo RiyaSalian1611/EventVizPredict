@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang='en'>
+    <head>
+        <script src="http://d3js.org/topojson.v0.min.js"></script>
+       <script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+<script src="https://unpkg.com/topojson-client@2"></script>
+<script src="d3.layout.cloud.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/holtzy/D3-graph-gallery@master/LIB/d3.layout.cloud.js"></script>
+<link rel="shortcut icon" href="#">
+<script src="main.js"></script>
+<style type="text/css">
+  body {
+  /* background-image: url('Data/crystalball.png');*/
+  background-repeat: no-repeat; 
+  background-attachment: fixed;
+  background-size: cover;
+  font-family: 'Trebuchet MS', sans-serif;
+  font-size: 15px;
+  font-weight: 300;
+  fill: #242424;
+  /*color:blanchedalmond;*/
+  color:black;
+  text-align: center;
+  cursor: default;
+}
+
+	.row,.align{
+  display:flex; 
+}
+.country {
+      stroke: #fff;
+      fill:rgba(248, 215, 68, 0.896);
+    } 
+    
+    div.tooltip {
+        position: absolute;
+        text-align: center;
+        width: 120px;
+        height: auto;
+        padding: 2px;
+        font: 15px arial;
+        background: white;
+        border: 2px black solid;
+        border-radius: 4px;
+
+        pointer-events: none;
+}
+
+#tipSVGRadial {
+    width:400px;
+    height:400px;
+    background-color: white;
+    border: 1px solid lightgray;
+    border-radius: 3px;
+}
+
+#tipSVGBar1 {
+
+    width:400px;
+    height:133px;
+/* =======
+    width:500px;
+    height:200px;
+>>>>>>> 0018de2ae2e13f9a1dda2e80fc35542657a32950 */
+    background-color: white;
+    border: 1px solid lightgray;
+    border-radius: 3px,
+}
+
+#tipSVGBar2 {
+
+    width:400px;
+    height:133px;
+/* =======
+    width:500px;
+    height:200px;
+>>>>>>> 0018de2ae2e13f9a1dda2e80fc35542657a32950 */
+    background-color: white;
+    border: 1px solid lightgray;
+    border-radius: 3px,
+}
+
+#tipSVGBar3 {
+
+    width:400px;
+    height:133px;
+/* =======
+    width:500px;
+    height:200px;
+>>>>>>> 0018de2ae2e13f9a1dda2e80fc35542657a32950 */
+    background-color: white;
+    border: 1px solid lightgray;
+    border-radius: 3px,
+}
+#my_dataviz{
+    width:auto; 
+    height:auto;
+    padding:10px;
+}
+
+#tipDivRadial,#tipDivBar{
+    float:left;
+    width: auto; 
+    height: auto;
+    padding:10px;
+}
+
+#tipDivBar{
+    float:right;
+}
+
+input[type="time"]::-webkit-clear-button {
+    display: none;
+  }
+
+input,
+label {
+    margin: .4rem 0;
+}
+
+</style>
+    </head>
+    <body>
+       
+
+<div class="container">
+  <div align="center">
+  <h1>CrystalBall: A Visual Analytic System</h1>
+  <h3>Sangeetha Ramaswami, Sai Likhith Yadav Seera, Suraj Jyothi Unni, Riya Salian, Keval Shah, Preksha Gandhi</h3>
+</div>
+<div class="row">
+  <div class="col-sm-5" style="border: medium solid black; border-radius: 25px; 
+  margin-right: 10px; margin-left: 10px; margin-top: 10px; margin-bottom: 10px;">
+    <div class="row-2" style="width:auto; margin-top: 1%; margin-left: 1%;">
+    <label for="points">Timeline:</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <label>From:</label>&nbsp;<input type="date" value="" min="2022-09-01" max="2022-12-31" id="d_start" name="points" step="1"/><!--onchange="getDateRange(twitter_csv)"/>-->&nbsp;&nbsp;&nbsp;
+    <label>To:</label>&nbsp;<input type="date" value="" min="2022-09-01" max="2022-12-31" id="d_end" name="points" step="1" /><!--onchange="getDateRange(twitter_csv)"/>-->&nbsp;&nbsp;&nbsp;
+    <button type="button" id="btnR" class="btn btn-dark mb-1" onclick="getDateRange(twitter_csv)">Apply</button>
+    <p id="st_demo"></p>
+    <p id="en_demo"></p>
+</div>
+<br>    
+<div id="my_eventviz" class="border border-dark rounded p-2 mb-2 bg-light shadow-sm">
+        <svg id="eventSvg" onload="onLoad()" width="600" height="600" style="margin-top: -4%;"></svg>
+</div></div>
+  <div class="col-sm-7" >
+  <div class="row">
+    <div class="col-xs-12 col-md-3 align" style="border: medium solid black; border-radius: 25px;
+    margin-right: 10px; margin-left: 10px; margin-top: 10px; margin-bottom: 10px;">
+      <div class="col-xs-4" style="margin-top: 1%;">
+         <svg id="my_dataviz" width="400" height="400"></svg>
+      </div>
+      <div class="col-xs-4">
+        <svg id="my_dataviz1" width="300" height="400"></svg>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-3" style="border: medium solid black; border-radius: 25px;
+    margin-right: 10px; margin-left: 10px; margin-top: 10px; margin-bottom: 10px;">
+      <div id="my_cloudviz1" >
+        <svg id="my_cloudviz" width="350" height="200"style="border-radius: 25px; margin-top: 2%;margin-left: -2%;" ></svg>
+      </div>     
+      </div>  
+      <div class="col-sm-3" style="border: medium solid black; border-radius: 25px;
+    margin-right: 10px; margin-left: 10px; margin-top: 10px; margin-bottom: 10px;">
+      <svg id="my_heatmapviz" width="350" height="200"  ></svg>
+    </div>
+  </div>
+  <!-- <div class="row">
+    <div class="col-sm-3" style="border: medium solid black; border-radius: 25px;
+    margin-right: 10px; margin-left: 10px; margin-top: 10px; margin-bottom: 10px;">
+      <svg id="my_heatmapviz" width="400" height="400" style="margin-top: -10%;" ></svg>
+    </div>
+  </div> -->
+  </div>
+</div>
+<!-- <div class="row">
+  
+    
+    <div class="col-sm-6" style="border: medium solid black; border-radius: 25px;
+    margin-right: 10px; margin-left: 10px; margin-top: 10px; margin-bottom: 10px;">
+    <div class="row">
+    <div class="col">
+      <svg id="my_dataviz2" width="350" height="200" style="margin-top: -1%;"></svg>
+      <svg id="my_dataviz3"width="350" height="200" style="margin-top: -1%;"></svg>
+    </div>
+    <div class="col">
+      <svg id="emotion_viz" width="290" height="200" style="margin-top: -1%;"></svg>
+    </div>  
+</div>
+
+    </div>
+    
+</div> -->
+</div>
+    </body>
+    
+</html> 
